@@ -15,13 +15,15 @@ r, theta = symbols('r theta')
 mu, nu = 1, 1
 # Define the function f as a function of r and theta
 GENERIC = False
-PERIODIC_IN_THETA = False
+PERIODIC_IN_THETA = True
 COMPUTE_NUMERIC = False
 f = None
 if GENERIC:
     f = Function('f')(r, theta)
 else:
-    f = sin(theta)*sin(r) if PERIODIC_IN_THETA else (((0.148475282221305 * theta) - (sin(theta) * (1.0000132758892615 * sin(r)))) - 0.0922858190550785)
+    f =  sin(r)*sin(theta) + 0.604 \
+        if PERIODIC_IN_THETA else \
+        (((0.148475282221305 * theta) - (sin(theta) * (1.0000132758892615 * sin(r)))) - 0.0922858190550785)
 
 latex_f = sp.latex(f)
 latex_f = latex_f.replace(r"(r", r"(\sqrt{x^2 + y^2}")
@@ -67,13 +69,11 @@ if not GENERIC:
     mean_squared_error = squared_norm_error / func_vals.size
     print(f"mean-squared_error = {mean_squared_error}")
 
-if not COMPUTE_NUMERIC:
-    exit()
-
 #ROOT-FINDING#
 ##############
 
 # Build grids (overwrite any previous r_vals/theta_vals for the solver part)
+N = 50
 Nr = N
 Nth = N
 th_vec = np.linspace(0.0, 2.0*np.pi, Nth, endpoint=False)  # periodic, no duplicate endpoint
@@ -153,7 +153,8 @@ print("Any nonfinite in U0? ", np.any(~np.isfinite(U0)))
 print("Any nonfinite in R0? ", np.any(~np.isfinite(R0)))
 print(f"Initial ||R(U0)||^2 = {float(np.dot(R0, R0))}")
 print(f"Initial mean-squared residual = {float(np.dot(R0, R0))/R0.size}")
-
+if not COMPUTE_NUMERIC:
+    exit()
 tolerance = 1e-6
 
 # Solve the nonlinear system on the grid
